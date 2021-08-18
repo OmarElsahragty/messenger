@@ -39,7 +39,7 @@ const UserAvatar = (props) => {
           alt={username}
           src={photoUrl}
           className={classes.profilePic}
-        ></Avatar>
+        />
       </Badge>
     </Box>
   );
