@@ -11,27 +11,16 @@ export const addMessageToStore = (state, payload) => {
     return [newConvo, ...state];
   }
 
-  let conversationIndex = -1;
-
-  const updatedState = state.map((convo, index) => {
-    if (convo.id === message.conversationId) {
-      conversationIndex = index;
-
+  return state.reduce((acc, convo, index) => {
+    const found = convo.id === message.conversationId;
+    if (found) {
       convo.messages.unshift(message);
       convo.latestMessageText = message.text;
-      return convo;
-    } else {
-      return convo;
     }
-  });
-  // * Get the conversation on the top
-  if (conversationIndex !== -1) {
-    const swapTemp = updatedState[conversationIndex];
-    updatedState[conversationIndex] = updatedState[0];
-    updatedState[0] = swapTemp;
-  }
-
-  return updatedState;
+    acc.push(convo);
+    if (found) [acc[0], acc[index]] = [acc[index], acc[0]];
+    return acc;
+  }, []);
 };
 
 export const addOnlineUserToStore = (state, id) => {

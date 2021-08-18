@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Box } from "@material-ui/core";
 import { Input, Header, Messages } from "./index";
@@ -21,44 +21,34 @@ const useStyles = makeStyles(() => ({
 }));
 
 const ActiveChat = ({ user, conversations, activeConversation }) => {
-  const [conversation, setConversation] = useState({});
-
   const classes = useStyles();
-
-  // * Get current conversation each time activeConversation or conversations change
-  useEffect(() => {
-    setConversation(
-      (conversations &&
-        conversations.find(
-          (conversation) =>
-            conversation.otherUser.username === activeConversation
-        )) ||
-        {}
-    );
-  }, [conversations, activeConversation]);
 
   return (
     <Box className={classes.root}>
-      {conversation.otherUser && (
-        <>
-          <Header
-            username={conversation.otherUser.username}
-            online={conversation.otherUser.online || false}
-          />
-          <Box className={classes.chatContainer}>
-            <Messages
-              messages={conversation.messages}
-              otherUser={conversation.otherUser}
-              userId={user.id}
-            />
-            <Input
-              otherUser={conversation.otherUser}
-              conversationId={conversation.id}
-              user={user}
-            />
-          </Box>
-        </>
-      )}
+      {conversations.map((conversation) => {
+        return (
+          conversation?.otherUser?.username === activeConversation && (
+            <>
+              <Header
+                username={conversation.otherUser.username}
+                online={conversation.otherUser.online || false}
+              />
+              <Box className={classes.chatContainer}>
+                <Messages
+                  messages={conversation.messages}
+                  otherUser={conversation.otherUser}
+                  userId={user.id}
+                />
+                <Input
+                  otherUser={conversation.otherUser}
+                  conversationId={conversation.id}
+                  user={user}
+                />
+              </Box>
+            </>
+          )
+        );
+      })}
     </Box>
   );
 };
