@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Box } from "@material-ui/core";
 import { Input, Header, Messages } from "./index";
@@ -8,7 +8,7 @@ const useStyles = makeStyles(() => ({
   root: {
     display: "flex",
     flexGrow: 8,
-    flexDirection: "column"
+    flexDirection: "column",
   },
   chatContainer: {
     marginLeft: 41,
@@ -16,14 +16,26 @@ const useStyles = makeStyles(() => ({
     display: "flex",
     flexDirection: "column",
     flexGrow: 1,
-    justifyContent: "space-between"
-  }
+    justifyContent: "space-between",
+  },
 }));
 
-const ActiveChat = (props) => {
+const ActiveChat = ({ user, conversations, activeConversation }) => {
+  const [conversation, setConversation] = useState({});
+
   const classes = useStyles();
-  const { user } = props;
-  const conversation = props.conversation || {};
+
+  // * Get current conversation each time activeConversation or conversations change
+  useEffect(() => {
+    setConversation(
+      (conversations &&
+        conversations.find(
+          (conversation) =>
+            conversation.otherUser.username === activeConversation
+        )) ||
+        {}
+    );
+  }, [conversations, activeConversation]);
 
   return (
     <Box className={classes.root}>
@@ -51,15 +63,10 @@ const ActiveChat = (props) => {
   );
 };
 
-const mapStateToProps = (state) => {
-  return {
-    user: state.user,
-    conversation:
-      state.conversations &&
-      state.conversations.find(
-        (conversation) => conversation.otherUser.username === state.activeConversation
-      )
-  };
-};
+const mapStateToProps = ({ user, conversations, activeConversation }) => ({
+  user,
+  conversations,
+  activeConversation,
+});
 
 export default connect(mapStateToProps, null)(ActiveChat);
