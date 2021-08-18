@@ -8,8 +8,8 @@ const Messages = (props) => {
 
   return (
     <Box>
-      {messages.map((_, index, array) => {
-        const message = array[array.length - 1 - index];
+      {messages.map((_, index) => {
+        const message = messages[messages.length - 1 - index];
 
         const time = moment(message.createdAt).format("h:mm");
 
