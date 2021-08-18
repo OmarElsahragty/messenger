@@ -43,7 +43,7 @@ const Sidebar = ({ handleChange, searchTerm, conversations }) => {
 };
 
 const mapStateToProps = (state) => ({
-  conversations: state.conversations || [],
+  conversations: state.conversations ?? [],
 });
 
 export default connect(mapStateToProps)(Sidebar);
