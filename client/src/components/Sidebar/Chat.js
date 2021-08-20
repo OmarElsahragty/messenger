@@ -14,29 +14,30 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     alignItems: "center",
     "&:hover": {
-      cursor: "grab"
-    }
-  }
+      cursor: "grab",
+    },
+  },
 }));
 
-const Chat = (props) => {
+const Chat = ({ otherUser, latestMessageText, setActiveChat }) => {
   const classes = useStyles();
-  const { conversation } = props;
-  const { otherUser } = conversation;
 
-  const handleClick = async (conversation) => {
-    await props.setActiveChat(conversation.otherUser.username);
+  const handleClick = async () => {
+    await setActiveChat(otherUser.username);
   };
 
   return (
-    <Box onClick={() => handleClick(conversation)} className={classes.root}>
+    <Box onClick={handleClick} className={classes.root}>
       <BadgeAvatar
         photoUrl={otherUser.photoUrl}
         username={otherUser.username}
         online={otherUser.online}
         sidebar={true}
       />
-      <ChatContent conversation={conversation} />
+      <ChatContent
+        otherUser={otherUser}
+        latestMessageText={latestMessageText}
+      />
     </Box>
   );
 };
@@ -45,7 +46,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     setActiveChat: (id) => {
       dispatch(setActiveChat(id));
-    }
+    },
   };
 };
 

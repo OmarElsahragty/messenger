@@ -10,8 +10,8 @@ import { clearOnLogout } from "../store/index";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    height: "100vh"
-  }
+    height: "calc(100vh - 36px)", // * 100vh - (Logout Btn)
+  },
 }));
 
 const Home = (props) => {
@@ -57,7 +57,7 @@ const Home = (props) => {
 const mapStateToProps = (state) => {
   return {
     user: state.user,
-    conversations: state.conversations
+    conversations: state.conversations,
   };
 };
 
@@ -69,7 +69,7 @@ const mapDispatchToProps = (dispatch) => {
     },
     fetchConversations: () => {
       dispatch(fetchConversations());
-    }
+    },
   };
 };
 

@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   root: {
     display: "flex",
     justifyContent: "space-between",
@@ -20,11 +20,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ChatContent = (props) => {
+const ChatContent = ({ latestMessageText, otherUser }) => {
   const classes = useStyles();
-
-  const { conversation } = props;
-  const { latestMessageText, otherUser } = conversation;
 
   return (
     <Box className={classes.root}>
