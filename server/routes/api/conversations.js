@@ -1,6 +1,6 @@
+const { Op } = require("sequelize");
 const router = require("express").Router();
 const { User, Conversation, Message } = require("../../db/models");
-const { Op } = require("sequelize");
 const onlineUsers = require("../../onlineUsers");
 
 // get all conversations for a user, include latest message text for preview, and all messages
@@ -80,9 +80,44 @@ router.get("/", async (req, res, next) => {
       convoJSON.latestMessageText =
         convoJSON.messages[convoJSON.messages.length - 1].text;
       conversations[i] = convoJSON;
+
+      conversations[i].unseenMessagesCount = 0;
+      messagesLoop: for (let q = convo.messages.length - 1; q >= 0; q--) {
+        const message = convo.messages[q].dataValues;
+        if (message.senderId === userId || message.isSeen) break messagesLoop;
+        conversations[i].unseenMessagesCount++;
+      }
     }
 
     res.json(conversations);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.patch("/seen/:id", async (req, res, next) => {
+  try {
+    if (!req.user) return res.sendStatus(401);
+    if (!req.params.id) return res.sendStatus(400);
+
+    const userId = req.user.id;
+    const conversationId = req.params.id;
+
+    const updatedConversation = await Message.update(
+      { isSeen: true },
+      {
+        where: {
+          conversationId,
+          senderId: {
+            [Op.not]: userId,
+          },
+          isSeen: false,
+        },
+        returning: true,
+      }
+    );
+
+    res.json(updatedConversation[1]);
   } catch (error) {
     next(error);
   }
