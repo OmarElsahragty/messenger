@@ -117,3 +117,10 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
     console.error(error);
   }
 };
+
+export const patchUnseenMessages = async (conversationId) => {
+  const { data } = await axios.patch(
+    `/api/conversations/seen/${conversationId}`
+  );
+  return data;
+};

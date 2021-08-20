@@ -1,11 +1,13 @@
 import React from "react";
-import { Box } from "@material-ui/core";
+import { Box, Badge } from "@material-ui/core";
 import { BadgeAvatar, ChatContent } from "../Sidebar";
 import { makeStyles } from "@material-ui/core/styles";
 import { setActiveChat } from "../../store/activeConversation";
+import { conversationSeen } from "../../store/conversations";
+import { patchUnseenMessages } from "../../store/utils/thunkCreators";
 import { connect } from "react-redux";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   root: {
     borderRadius: 8,
     height: 80,
@@ -17,13 +19,27 @@ const useStyles = makeStyles((theme) => ({
       cursor: "grab",
     },
   },
+  badge: {
+    position: "relative",
+    left: -15,
+  },
 }));
 
-const Chat = ({ otherUser, latestMessageText, setActiveChat }) => {
+const Chat = ({
+  setActiveChat,
+  conversationSeen,
+  conversationId,
+  otherUser,
+  isOnline,
+  latestMessageText,
+  unseenMessagesCount,
+}) => {
   const classes = useStyles();
 
   const handleClick = async () => {
+    await conversationSeen(otherUser.id);
     await setActiveChat(otherUser.username);
+    patchUnseenMessages(conversationId);
   };
 
   return (
@@ -31,12 +47,19 @@ const Chat = ({ otherUser, latestMessageText, setActiveChat }) => {
       <BadgeAvatar
         photoUrl={otherUser.photoUrl}
         username={otherUser.username}
-        online={otherUser.online}
+        online={isOnline}
         sidebar={true}
       />
       <ChatContent
         otherUser={otherUser}
         latestMessageText={latestMessageText}
+        unseenAlert={unseenMessagesCount > 0}
+      />
+
+      <Badge
+        color="primary"
+        className={classes.badge}
+        badgeContent={unseenMessagesCount}
       />
     </Box>
   );
@@ -46,6 +69,9 @@ const mapDispatchToProps = (dispatch) => {
   return {
     setActiveChat: (id) => {
       dispatch(setActiveChat(id));
+    },
+    conversationSeen: (recipientId) => {
+      dispatch(conversationSeen(recipientId));
     },
   };
 };
