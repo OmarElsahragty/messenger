@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Chat = ({ otherUser, latestMessage, setActiveChat }) => {
+const Chat = ({ otherUser, latestMessageText, setActiveChat }) => {
   const classes = useStyles();
 
   const handleClick = async () => {
@@ -34,7 +34,10 @@ const Chat = ({ otherUser, latestMessage, setActiveChat }) => {
         online={otherUser.online}
         sidebar={true}
       />
-      <ChatContent otherUser={otherUser} latestMessage={latestMessage} />
+      <ChatContent
+        otherUser={otherUser}
+        latestMessageText={latestMessageText}
+      />
     </Box>
   );
 };

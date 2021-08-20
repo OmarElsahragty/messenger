@@ -34,7 +34,7 @@ const Sidebar = ({ handleChange, searchTerm, conversations }) => {
         .map((conversation) => (
           <Chat
             key={conversation.otherUser.username}
-            latestMessage={conversation.latestMessageText}
+            latestMessageText={conversation.latestMessageText}
             otherUser={conversation.otherUser}
           />
         ))}

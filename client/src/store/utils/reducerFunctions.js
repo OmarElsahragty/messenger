@@ -11,16 +11,26 @@ export const addMessageToStore = (state, payload) => {
     return [newConvo, ...state];
   }
 
-  return state.reduce((acc, convo, index) => {
-    const found = convo.id === message.conversationId;
-    if (found) {
-      convo.messages.unshift(message);
-      convo.latestMessageText = message.text;
-    }
-    acc.push(convo);
-    if (found) [acc[0], acc[index]] = [acc[index], acc[0]];
-    return acc;
-  }, []);
+  const stateCopy = [...state];
+  const convoIndex = stateCopy.findIndex(
+    (convo) => convo.id === message.conversationId
+  );
+  const convo = stateCopy[convoIndex];
+  convo.messages.push(message);
+  convo.latestMessageText = message.text;
+
+  // * shifting the last conversation to the top (keeping the order of the rest conversations)
+  if (convoIndex === 1) {
+    [stateCopy[0], stateCopy[convoIndex]] = [
+      stateCopy[convoIndex],
+      stateCopy[0],
+    ];
+  } else if (convoIndex !== 0) {
+    stateCopy.splice(convoIndex, 1);
+    stateCopy.unshift(convo);
+  }
+
+  return stateCopy;
 };
 
 export const addOnlineUserToStore = (state, id) => {
@@ -49,22 +59,21 @@ export const removeOfflineUserFromStore = (state, id) => {
 
 export const addSearchedUsersToStore = (state, users) => {
   const currentUsers = {};
-
   // make table of current users so we can lookup faster
-  state.forEach((convo) => {
+  for (const convo of state) {
     currentUsers[convo.otherUser.id] = true;
-  });
+  }
 
-  const newState = [...state];
-  users.forEach((user) => {
+  const stateCopy = [...state];
+  for (const user of users) {
     // only create a fake convo if we don't already have a convo with this user
     if (!currentUsers[user.id]) {
-      let fakeConvo = { otherUser: user, messages: [] };
-      newState.push(fakeConvo);
+      const fakeConvo = { otherUser: user, messages: [] };
+      stateCopy.push(fakeConvo);
     }
-  });
+  }
 
-  return newState;
+  return stateCopy;
 };
 
 export const addNewConvoToStore = (state, recipientId, message) => {

@@ -20,7 +20,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const ChatContent = ({ latestMessage, otherUser }) => {
+const ChatContent = ({ latestMessageText, otherUser }) => {
   const classes = useStyles();
 
   return (
@@ -29,7 +29,9 @@ const ChatContent = ({ latestMessage, otherUser }) => {
         <Typography className={classes.username}>
           {otherUser.username}
         </Typography>
-        <Typography className={classes.previewText}>{latestMessage}</Typography>
+        <Typography className={classes.previewText}>
+          {latestMessageText}
+        </Typography>
       </Box>
     </Box>
   );
