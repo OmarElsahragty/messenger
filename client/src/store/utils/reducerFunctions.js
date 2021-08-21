@@ -97,8 +97,9 @@ export const addNewConvoToStore = (state, recipientId, message) => {
 export const updateUnseenMessagesInStore = (state, recipientId) => {
   return state.map((conversation) => {
     if (conversation.otherUser.id === recipientId) {
-      conversation.unseenMessagesCount = 0;
-      return conversation;
+      const convoCopy = { ...conversation };
+      convoCopy.unseenMessagesCount = 0;
+      return convoCopy;
     }
     return conversation;
   });

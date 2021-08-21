@@ -39,7 +39,7 @@ const Chat = ({
   const handleClick = async () => {
     await conversationSeen(otherUser.id);
     await setActiveChat(otherUser.username);
-    patchUnseenMessages(conversationId);
+    await patchUnseenMessages(conversationId);
   };
 
   return (
