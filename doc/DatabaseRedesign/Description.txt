@@ -1,0 +1,101 @@
+Database redesign allowing conversations with groups.
+-------------------------------------------------------------------------------------------------------------------------
+
+First as mentioned in the database ERD, we need to add a database many to many relationships
+between users and conversations `participants` in the database allowing the conversation to 
+have multiple users, store the last seen for each user per conversation `lastSeen` with
+timestamp datatype, add `name` attribute to the conversation provide the group name
+if it's not direct chat (2 participants or more), and remove the isSeen attribute from the messages
+because multiple users can read a single message in a conversation.
+
+-------------------------------------------------------------------------------------------------------------------------
+
+On the server-side:
+We need to update the `GET /api/conversations` endpoint, conversations selection from the database
+to match the new design, remove the `user1`, `user2`, and `otherUser` and provide the conversation participants
+instead of it, and get the `unseenMessagesCount` based on the requested user `lastSeen` for the conversation
+compared to messages `createdAt` time. the response should be something like that:
+`[
+  {
+    "id": 1,
+    "name": null,
+    "participants": [
+      {
+        "online": false,
+        "lastSeen": "2021-08-21T01:11:16.659Z",
+        "user": { "id": 1, "username": "Sahragty", "photoUrl": null }
+      },
+      {
+        "online": false,
+        "lastSeen": "2021-08-21T01:11:16.659Z",
+        "user": { "id": 2, "username": "Eric", "photoUrl": null }
+      }
+    ],
+    "messages": [
+      {
+        "text": "Where are you from?",
+        "createdAt": "2021-08-21T01:11:16.659Z",
+        "sender": { "id": 2, "username": "Eric", "photoUrl": null }
+      },
+    ],
+    "latestMessageText": "Where are you from?",
+    "unseenMessagesCount": 1
+  },
+  {
+    "id": 2,
+    "name": "Friends",
+    "participants": [
+      {
+        "online": false,
+        "lastSeen": "2021-08-21T01:11:16.659Z",
+        "user": { "id": 1, "username": "Sahragty", "photoUrl": null }
+      },
+      {
+        "online": false,
+        "lastSeen": "2021-08-21T01:11:16.659Z",
+        "user": { "id": 2, "username": "Eric", "photoUrl": null }
+      },
+      {
+        "online": false,
+        "lastSeen": "2021-08-21T01:11:16.659Z",
+        "user": { "id": 3, "username": "Kali", "photoUrl": null }
+      }
+    ],
+    "messages": [],
+    "latestMessageText": "",
+    "unseenMessagesCount": 0
+  }
+]`
+
+Refactor `PATCH /api/conversations/markAsSeen/:id` endpoint to update the requested user conversation
+`lastSeen`, while `POST /api/messages` endpoint will not requires the `recipientId` in the request body.
+
+The socket should be using a room with the conversation id instead of the user id to send the messages on it, which requires
+each user on the same conversation to join the same room with the conversation id so the message reaches all of them.
+
+We are going to need to add some new endpoints to provide some features such as `POST /api/group` creating a new group
+with users and group name provided in the request body, `PUT /api/group` update the group, `POST /api/group/users/:id`
+add new users to the group, remove existing users `DELETE /api/group/users/:id`, and `GET /api/group/users/:id`
+list existing users inside the group.
+
+-------------------------------------------------------------------------------------------------------------------------
+
+On the client-side:
+We will need some UI for the group creation, adding new users, removing existing users, update the group, and show
+existing users inside the group.
+
+The Redux store conversations state is going to change as the response of the `GET /api/conversations`
+endpoint changed and there are going to be two main types of conversations direct (only 2 participants)
+and group (2 participants or more) based on if the conversation has a name or not (group name).
+
+Instead of depending on the other user (recipient) in the messages, each message should have its sender
+to detect who sent it instead of detecting who recipient it because there are going to be multiple recipients.
+
+The active conversation is going to be depending on the conversation id instead of the other user (recipient).
+
+In the sidebar and the active chat header components, if the conversation name is provided from the `GET /api/conversations`
+endpoint meaning that it's a group conversation then its header going to be shown as the conversation name instead of
+other user (recipient) name, that requires a change into `addNewConvoToStore` reducer to check if the new conversation has a name or not.
+
+In the active chat messages component, `SenderBubble` and `OtherUserBubble` is going to be controlled by if the sender id
+is equal to the current user id or not.
