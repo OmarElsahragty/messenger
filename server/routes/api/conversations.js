@@ -95,7 +95,7 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.patch("/seen/:id", async (req, res, next) => {
+router.patch("/markAsSeen/:id", async (req, res, next) => {
   try {
     if (!req.user) return res.sendStatus(401);
     if (!req.params.id) return res.sendStatus(400);
@@ -111,7 +111,6 @@ router.patch("/seen/:id", async (req, res, next) => {
           senderId: {
             [Op.not]: userId,
           },
-          isSeen: false,
         },
         returning: true,
       }

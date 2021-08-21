@@ -72,7 +72,7 @@ export const addConversation = (recipientId, newMessage) => {
 export const conversationSeen = (recipientId) => {
   return {
     type: CONVERSATION_SEEN,
-    recipientId,
+    payload: recipientId,
   };
 };
 
@@ -101,7 +101,7 @@ const reducer = (state = [], action) => {
         action.payload.newMessage
       );
     case CONVERSATION_SEEN:
-      return updateUnseenMessagesInStore(state, action.recipientId);
+      return updateUnseenMessagesInStore(state, action.payload);
     default:
       return state;
   }

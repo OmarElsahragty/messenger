@@ -8,5 +8,5 @@ module.exports = Object.freeze({
   SessionSecret: process.env.SESSION_SECRET,
 
   DatabaseURL:
-    process.env.DATABASE_URL || "postgres://localhost:5432/messenger",
+    process.env.DATABASE_URL ?? "postgres://localhost:5432/messenger",
 });

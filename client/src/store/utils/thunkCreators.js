@@ -120,7 +120,7 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
 
 export const patchUnseenMessages = async (conversationId) => {
   const { data } = await axios.patch(
-    `/api/conversations/seen/${conversationId}`
+    `/api/conversations/markAsSeen/${conversationId}`
   );
   return data;
 };
