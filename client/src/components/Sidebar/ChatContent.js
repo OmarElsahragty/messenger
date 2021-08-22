@@ -16,7 +16,7 @@ const useStyles = makeStyles(() => ({
     fontWeight: "bold",
     letterSpacing: -0.2,
   },
-  previewText: {
+  previewTextSeen: {
     fontSize: 12,
     color: "#9CADC8",
     letterSpacing: -0.17,
@@ -25,9 +25,15 @@ const useStyles = makeStyles(() => ({
     whiteSpace: "nowrap",
     textOverflow: "ellipsis",
   },
-  unseen: {
+  previewTextUnseen: {
+    fontSize: 12,
     fontWeight: "bold",
-    color: "#000000de !important",
+    color: "#000000de",
+    letterSpacing: -0.17,
+    width: "150px",
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+    textOverflow: "ellipsis",
   },
 }));
 
@@ -41,7 +47,9 @@ const ChatContent = ({ latestMessageText, otherUser, unseenAlert }) => {
           {otherUser.username}
         </Typography>
         <Typography
-          className={`${classes.previewText} ${unseenAlert && classes.unseen}`}
+          className={
+            unseenAlert ? classes.previewTextUnseen : classes.previewTextSeen
+          }
         >
           {latestMessageText}
         </Typography>

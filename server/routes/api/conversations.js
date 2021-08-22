@@ -82,11 +82,11 @@ router.get("/", async (req, res, next) => {
       conversations[i] = convoJSON;
 
       conversations[i].unseenMessagesCount = 0;
-      messagesLoop: for (let q = convo.messages.length - 1; q >= 0; q--) {
-        const message = convo.messages[q].dataValues;
-        if (message.senderId === userId || message.isSeen) break messagesLoop;
-        conversations[i].unseenMessagesCount++;
-      }
+      convoJSON.messages.map((message) => {
+        if (message.senderId !== userId && !message.isSeen) {
+          conversations[i].unseenMessagesCount++;
+        }
+      });
     }
 
     res.json(conversations);

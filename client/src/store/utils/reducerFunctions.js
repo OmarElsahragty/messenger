@@ -29,7 +29,10 @@ export const addMessageToStore = (state, payload) => {
 
   // * shifting the last conversation to the top (keeping the order of the rest conversations)
   if (convoIndex === 1) {
-    [stateCopy[0], stateCopy[1]] = [stateCopy[1], stateCopy[0]];
+    [stateCopy[0], stateCopy[convoIndex]] = [
+      stateCopy[convoIndex],
+      stateCopy[0],
+    ];
   } else if (convoIndex !== 0) {
     stateCopy.splice(convoIndex, 1);
     stateCopy.unshift(convo);
