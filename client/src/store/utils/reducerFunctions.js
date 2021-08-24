@@ -1,11 +1,12 @@
 export const addMessageToStore = (state, payload) => {
-  const { message, sender } = payload;
+  const { message, sender, activeConversation } = payload;
   // if sender isn't null, that means the message needs to be put in a brand new convo
   if (sender !== null) {
     const newConvo = {
       id: message.conversationId,
       otherUser: sender,
       messages: [message],
+      unseenMessagesCount: 1,
     };
     newConvo.latestMessageText = message.text;
     return [newConvo, ...state];
@@ -18,6 +19,13 @@ export const addMessageToStore = (state, payload) => {
   const convo = stateCopy[convoIndex];
   convo.messages.push(message);
   convo.latestMessageText = message.text;
+
+  if (
+    message.senderId === convo.otherUser.id &&
+    activeConversation !== convo.otherUser.username
+  ) {
+    convo.unseenMessagesCount++;
+  }
 
   // * shifting the last conversation to the top (keeping the order of the rest conversations)
   if (convoIndex === 1) {
@@ -86,5 +94,16 @@ export const addNewConvoToStore = (state, recipientId, message) => {
     } else {
       return convo;
     }
+  });
+};
+
+export const updateUnseenMessagesInStore = (state, recipientId) => {
+  return state.map((conversation) => {
+    if (conversation.otherUser.id === recipientId) {
+      const convoCopy = { ...conversation };
+      convoCopy.unseenMessagesCount = 0;
+      return convoCopy;
+    }
+    return conversation;
   });
 };
