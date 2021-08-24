@@ -27,7 +27,6 @@ const useStyles = makeStyles(() => ({
 
 const Chat = ({
   setActiveChat,
-  conversationSeen,
   conversationId,
   otherUser,
   isOnline,
@@ -37,9 +36,7 @@ const Chat = ({
   const classes = useStyles();
 
   const handleClick = async () => {
-    await conversationSeen(otherUser.id);
-    await setActiveChat(otherUser.username);
-    await patchUnseenMessages(conversationId);
+    await setActiveChat(otherUser, conversationId);
   };
 
   return (
@@ -67,11 +64,10 @@ const Chat = ({
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    setActiveChat: (id) => {
-      dispatch(setActiveChat(id));
-    },
-    conversationSeen: (recipientId) => {
-      dispatch(conversationSeen(recipientId));
+    setActiveChat: async (otherUser, conversationId) => {
+      dispatch(conversationSeen(otherUser.id));
+      dispatch(setActiveChat(otherUser.username));
+      await patchUnseenMessages(conversationId);
     },
   };
 };
