@@ -3,9 +3,12 @@ import socket from "../../socket";
 import {
   gotConversations,
   addConversation,
-  setNewMessage,
   setSearchedUsers,
+  setNewMessage,
+  addUserToConvAction,
+  removeUserFromConvAction,
 } from "../conversations";
+import { setUsers } from "../users";
 import { gotUser, setFetchingStatus } from "../user";
 
 axios.interceptors.request.use(async function (config) {
@@ -23,7 +26,7 @@ export const fetchUser = () => async (dispatch) => {
     const { data } = await axios.get("/auth/user");
     dispatch(gotUser(data));
     if (data.id) {
-      socket.emit("go-online", data.id);
+      socket.emit("go-online", { userId: data.id });
     }
   } catch (error) {
     console.error(error);
@@ -37,7 +40,7 @@ export const register = (credentials) => async (dispatch) => {
     const { data } = await axios.post("/auth/register", credentials);
     await localStorage.setItem("messenger-token", data.token);
     dispatch(gotUser(data));
-    socket.emit("go-online", data.id);
+    socket.emit("go-online", { userId: data.id });
   } catch (error) {
     console.error(error);
     dispatch(gotUser({ error: error.response.data.error || "Server Error" }));
@@ -49,7 +52,7 @@ export const login = (credentials) => async (dispatch) => {
     const { data } = await axios.post("/auth/login", credentials);
     await localStorage.setItem("messenger-token", data.token);
     dispatch(gotUser(data));
-    socket.emit("go-online", data.id);
+    socket.emit("go-online", { userId: data.id });
   } catch (error) {
     console.error(error);
     dispatch(gotUser({ error: error.response.data.error || "Server Error" }));
@@ -73,6 +76,11 @@ export const fetchConversations = () => async (dispatch) => {
   try {
     const { data } = await axios.get("/api/conversations");
     dispatch(gotConversations(data));
+    await Promise.all(
+      data.forEach((conversation) => {
+        socket.emit("go-online", { conversationId: conversation.id });
+      })
+    );
   } catch (error) {
     console.error(error);
   }
@@ -83,12 +91,8 @@ const saveMessage = async (body) => {
   return data;
 };
 
-const sendMessage = (data, body) => {
-  socket.emit("new-message", {
-    message: data.message,
-    recipientId: body.recipientId,
-    sender: data.sender,
-  });
+const sendMessage = (data) => {
+  socket.emit("new-message", data);
 };
 
 // message format to send: {recipientId, text, conversationId}
@@ -98,12 +102,12 @@ export const postMessage = (body) => async (dispatch) => {
     const data = await saveMessage(body);
 
     if (!body.conversationId) {
-      dispatch(addConversation(body.recipientId, data.message));
+      dispatch(addConversation(data));
+      sendMessage({ ...data.messages[0], conversationId: data.id });
     } else {
-      dispatch(setNewMessage(data.message));
+      sendMessage(body);
+      dispatch(setNewMessage(data));
     }
-
-    sendMessage(data, body);
   } catch (error) {
     console.error(error);
   }
@@ -124,3 +128,35 @@ export const patchUnseenMessages = async (conversationId) => {
   );
   return data;
 };
+
+export const getUsers = () => async (dispatch) => {
+  try {
+    const { data } = await axios.get("/api/users");
+    dispatch(setUsers(data));
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const addUserToConv = (conversationId, userId) => async (dispatch) => {
+  try {
+    const { data } = await axios.post(
+      `/api/conversations/${conversationId}/user/${userId}`
+    );
+    dispatch(addUserToConvAction(data));
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const removeUserFromConv =
+  (conversationId, userId) => async (dispatch) => {
+    try {
+      const { data } = await axios.delete(
+        `/api/conversations/${conversationId}/user/${userId}`
+      );
+      dispatch(removeUserFromConvAction(data));
+    } catch (error) {
+      console.error(error);
+    }
+  };

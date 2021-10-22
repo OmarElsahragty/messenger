@@ -19,10 +19,10 @@ socket.on("connect", () => {
     store.dispatch(removeOfflineUser(id));
   });
   socket.on("new-message", (data) => {
-    const { activeConversation } = store.getState();
-    store.dispatch(
-      setNewMessage(data.message, data.sender, activeConversation)
-    );
+    const { activeConversation, user } = store.getState();
+    if (user.id !== data.senderId) {
+      store.dispatch(setNewMessage(data, user.id, activeConversation));
+    }
   });
 });
 

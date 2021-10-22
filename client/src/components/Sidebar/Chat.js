@@ -28,7 +28,9 @@ const useStyles = makeStyles(() => ({
 const Chat = ({
   setActiveChat,
   conversationId,
-  otherUser,
+  name,
+  users,
+  photoUrl,
   isOnline,
   latestMessageText,
   unseenMessagesCount,
@@ -36,19 +38,19 @@ const Chat = ({
   const classes = useStyles();
 
   const handleClick = async () => {
-    await setActiveChat(otherUser, conversationId);
+    await setActiveChat(users, conversationId);
   };
 
   return (
     <Box onClick={handleClick} className={classes.root}>
       <BadgeAvatar
-        photoUrl={otherUser.photoUrl}
-        username={otherUser.username}
-        online={isOnline}
+        name={name}
+        photoUrl={photoUrl}
+        isOnline={isOnline}
         sidebar={true}
       />
       <ChatContent
-        otherUser={otherUser}
+        name={name}
         latestMessageText={latestMessageText}
         unseenAlert={unseenMessagesCount > 0}
       />
@@ -64,9 +66,9 @@ const Chat = ({
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    setActiveChat: async (otherUser, conversationId) => {
-      dispatch(conversationSeen(otherUser.id));
-      dispatch(setActiveChat(otherUser.username));
+    setActiveChat: async (users, conversationId) => {
+      dispatch(conversationSeen(conversationId));
+      dispatch(setActiveChat({ users, conversationId }));
       await patchUnseenMessages(conversationId);
     },
   };

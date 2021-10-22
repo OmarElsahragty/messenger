@@ -28,15 +28,15 @@ const Sidebar = ({ handleChange, searchTerm, conversations }) => {
       <Typography className={classes.title}>Chats</Typography>
       <Search handleChange={handleChange} />
       {conversations
-        .filter((conversation) =>
-          conversation.otherUser.username.includes(searchTerm)
-        )
+        .filter(({ name }) => name.includes(searchTerm))
         .map((conversation) => (
           <Chat
-            key={conversation.otherUser.username}
+            key={conversation.id}
+            name={conversation.name}
+            users={conversation.users}
             conversationId={conversation.id}
-            otherUser={conversation.otherUser}
-            isOnline={conversation.otherUser.online}
+            photoUrl={conversation.photoUrl}
+            isOnline={conversation.onlineCount > 0}
             latestMessageText={conversation.latestMessageText}
             unseenMessagesCount={conversation.unseenMessagesCount}
           />

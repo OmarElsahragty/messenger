@@ -17,10 +17,9 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Input = (props) => {
+const Input = ({ postMessage, conversationId, userId, users = [] }) => {
   const classes = useStyles();
   const [text, setText] = useState("");
-  const { postMessage, otherUser, conversationId, user } = props;
 
   const handleChange = (event) => {
     setText(event.target.value);
@@ -30,14 +29,12 @@ const Input = (props) => {
     event.preventDefault();
     const text = event.target.text.value;
     if (!text || text.length === 0) return;
-    // add sender user info if posting to a brand new convo, so that the other user will have access to username, profile pic, etc.
-    const reqBody = {
+
+    await postMessage({
       text,
-      recipientId: otherUser.id,
+      recipientId: users.length > 1 ? null : users[0].id,
       conversationId,
-      sender: conversationId ? null : user,
-    };
-    await postMessage(reqBody);
+    });
     setText("");
   };
 
