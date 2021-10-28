@@ -111,7 +111,7 @@ const reducer = (state = [], action) => {
     case SET_SEARCHED_USERS:
       return addSearchedUsersToStore(state, action.users);
     case CLEAR_SEARCHED_USERS:
-      return state.filter((convo) => convo.id);
+      return state.filter((convo) => convo.id && typeof convo.id === "number");
     case ADD_CONVERSATION:
       return addNewConvoToStore(state, action.payload.conversation);
     case MARK_CONVERSATION_AS_SEEN:

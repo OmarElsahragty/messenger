@@ -24,18 +24,19 @@ const ActiveChat = ({ user, conversations, activeConversation }) => {
   const classes = useStyles();
 
   const conversation = conversations.find(
-    ({ id }) => id === activeConversation?.conversationId
+    ({ id }) => activeConversation?.conversationId === id
   );
 
   return (
     <Box className={classes.root}>
-      {conversation && (
+      {activeConversation?.conversationId && conversation && (
         <>
           <Header
             participants={[user, ...conversation.users]}
             name={conversation.name}
             isOnline={conversation.onlineCount > 0}
             conversationId={conversation.id}
+            messages={conversation.messages}
           />
           <Box className={classes.chatContainer}>
             <Messages
@@ -44,7 +45,6 @@ const ActiveChat = ({ user, conversations, activeConversation }) => {
               messages={conversation.messages}
             />
             <Input
-              userId={user.id}
               users={conversation.users}
               conversationId={conversation.id}
             />

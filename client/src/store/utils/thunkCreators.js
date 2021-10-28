@@ -105,7 +105,7 @@ export const postMessage = (body) => async (dispatch) => {
       dispatch(addConversation(data));
       sendMessage({ ...data.messages[0], conversationId: data.id });
     } else {
-      sendMessage(body);
+      sendMessage(data);
       dispatch(setNewMessage(data));
     }
   } catch (error) {

@@ -2,8 +2,10 @@ export const addMessageToStore = (state, payload) => {
   const { message, userId, activeConversation } = payload;
 
   const stateCopy = [...state];
+
   const convoIndex = stateCopy.findIndex(
-    (convo) => convo.id === message.conversationId
+    (convo) =>
+      typeof convo.id === "number" && convo.id === message.conversationId
   );
 
   stateCopy[convoIndex].messages.push(message);
@@ -12,7 +14,7 @@ export const addMessageToStore = (state, payload) => {
   if (
     userId &&
     userId !== message.senderId &&
-    stateCopy[convoIndex].id !== activeConversation?.conversationId
+    stateCopy[convoIndex]?.id !== activeConversation?.conversationId
   ) {
     stateCopy[convoIndex].unseenMessagesCount++;
   }
@@ -21,8 +23,8 @@ export const addMessageToStore = (state, payload) => {
   if (convoIndex === 1) {
     [stateCopy[0], stateCopy[1]] = [stateCopy[1], stateCopy[0]];
   } else if (convoIndex !== 0) {
-    stateCopy.splice(convoIndex, 1);
     stateCopy.unshift(stateCopy[convoIndex]);
+    stateCopy.splice(convoIndex + 1, 1);
   }
 
   return stateCopy;
@@ -56,9 +58,7 @@ export const addSearchedUsersToStore = (state, users) => {
   const currentUsers = {};
   // make table of current users so we can lookup faster
   for (const convo of state) {
-    for (const user of convo.users) {
-      currentUsers[user.id] = true;
-    }
+    if (convo.users.length === 1) currentUsers[convo.users[0].id] = true;
   }
 
   const stateCopy = [...state];
@@ -66,6 +66,7 @@ export const addSearchedUsersToStore = (state, users) => {
     // only create a fake convo if we don't already have a convo with this user
     if (!currentUsers[user.id]) {
       stateCopy.push({
+        id: `fake-${user.id}`,
         createdAt: Date.now(),
         messages: [],
         users: [user],
@@ -86,6 +87,7 @@ export const addNewConvoToStore = (state, NewConvo) => {
   const stateCopy = [...state];
   const fakeConversationIndex = stateCopy.findIndex(
     (conversation) =>
+      typeof conversation.id === "string" &&
       conversation.users[0].username === NewConvo.users[0].username
   );
 
@@ -111,7 +113,14 @@ export const addConvoUser = (state, { user, conversationId }) => {
   const conversationIndex = stateCopy.findIndex(
     ({ id }) => conversationId === id
   );
+
   stateCopy[conversationIndex].users.push(user);
+
+  stateCopy[conversationIndex].photoUrl = null;
+
+  stateCopy[conversationIndex].name = stateCopy[conversationIndex].users
+    .map(({ username }) => username)
+    .join(", ");
 
   return stateCopy;
 };
@@ -127,6 +136,15 @@ export const removeConvoUser = (state, { userId, conversationId }) => {
   );
 
   stateCopy[conversationIndex].users.splice(userIndex, 1);
+
+  stateCopy[conversationIndex].name = stateCopy[conversationIndex].users
+    .map(({ username }) => username)
+    .join(", ");
+
+  stateCopy[conversationIndex].photoUrl =
+    stateCopy[conversationIndex].users.length === 1
+      ? stateCopy[conversationIndex].users[0].photoUrl
+      : null;
 
   return stateCopy;
 };

@@ -17,7 +17,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Input = ({ postMessage, conversationId, userId, users = [] }) => {
+const Input = ({ postMessage, conversationId, users = [] }) => {
   const classes = useStyles();
   const [text, setText] = useState("");
 
@@ -33,7 +33,8 @@ const Input = ({ postMessage, conversationId, userId, users = [] }) => {
     await postMessage({
       text,
       recipientId: users.length > 1 ? null : users[0].id,
-      conversationId,
+      conversationId:
+        typeof conversationId === "number" ? conversationId : null,
     });
     setText("");
   };

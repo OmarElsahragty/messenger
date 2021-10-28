@@ -37,7 +37,7 @@ router.post("/", async (req, res, next) => {
     );
 
     const conversation = await Conversation.findByPk(createdConversation.id, {
-      attributes: ["createdAt"],
+      attributes: ["id", "createdAt"],
       include: [
         {
           model: Message,
@@ -57,6 +57,7 @@ router.post("/", async (req, res, next) => {
     conversationJSON.lastSeen = Date.now();
     conversationJSON.unseenMessagesCount = 0;
     conversationJSON.latestMessageText = text;
+    conversationJSON.photoUrl = conversationJSON.users[0].photoUrl;
 
     conversationJSON.name = conversationJSON.users
       .map(({ username }) => username)

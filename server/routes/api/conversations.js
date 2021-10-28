@@ -178,13 +178,20 @@ router.post("/:conversationId/user/:userId", async (req, res, next) => {
     const { conversationId, userId } = req.params;
     if (!conversationId || !userId) return res.sendStatus(400);
 
+    const user = await User.findByPk(userId, {
+      attributes: ["id", "username", "photoUrl"],
+    });
+
     try {
-      return res.json(
-        await Participant.create({
-          conversationId,
-          userId,
-        })
-      );
+      const createdParticipant = await Participant.create({
+        conversationId,
+        userId,
+      });
+
+      return res.json({
+        ...createdParticipant.toJSON(),
+        user: user.toJSON(),
+      });
     } catch {
       const restoredParticipant = await Participant.restore({
         where: {
@@ -196,9 +203,6 @@ router.post("/:conversationId/user/:userId", async (req, res, next) => {
       });
 
       if (restoredParticipant[0]) {
-        const user = await User.findByPk(userId, {
-          attributes: ["id", "username", "photoUrl"],
-        });
         return res.json({
           ...restoredParticipant[0].toJSON(),
           user: user.toJSON(),

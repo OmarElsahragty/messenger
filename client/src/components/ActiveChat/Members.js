@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -44,19 +44,27 @@ const Members = ({
   addUserToConv,
   removeUserFromConv,
   conversationId,
+  messages = [],
 }) => {
-  const [participantUsers, setParticipantUsers] = useState(
-    users.map((user) => ({
-      ...user,
-      isParticipant: !!participants.find(
-        (participant) => participant.id === user.id
-      ),
-    }))
-  );
+  const [participantUsers, setParticipantUsers] = useState([]);
 
   const classes = useStyles();
 
+  useEffect(() => {
+    if (!visible) return;
+
+    setParticipantUsers(
+      users.map((user) => ({
+        ...user,
+        isParticipant: !!participants.find(
+          (participant) => participant.id === user.id
+        ),
+      }))
+    );
+  }, [visible]);
+
   function handleClose() {
+    setParticipantUsers([]);
     visibleabltyToggle();
   }
 
@@ -109,18 +117,20 @@ const Members = ({
                   />
                   <Typography>{user.username}</Typography>
                 </Grid>
-                <Checkbox
-                  defaultChecked={user.isParticipant}
-                  onClick={() => handleClick(user)}
-                  icon={
-                    <RadioButtonUnchecked
-                      classes={{ root: classes.buttonUnchecked }}
-                    />
-                  }
-                  checkedIcon={
-                    <CheckCircle classes={{ root: classes.buttonChecked }} />
-                  }
-                />
+                {!messages.find(({ senderId }) => user.id === senderId) && (
+                  <Checkbox
+                    defaultChecked={user.isParticipant}
+                    onClick={() => handleClick(user)}
+                    icon={
+                      <RadioButtonUnchecked
+                        classes={{ root: classes.buttonUnchecked }}
+                      />
+                    }
+                    checkedIcon={
+                      <CheckCircle classes={{ root: classes.buttonChecked }} />
+                    }
+                  />
+                )}
               </Grid>
             </ListItem>
           ))}

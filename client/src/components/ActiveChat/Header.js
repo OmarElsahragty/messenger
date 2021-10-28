@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Header = ({ name, isOnline, participants, conversationId }) => {
+const Header = ({ name, isOnline, participants, conversationId, messages }) => {
   const [MembersDialogVisibleablty, setMembersDialogVisibleablty] =
     useState(false);
 
@@ -79,6 +79,7 @@ const Header = ({ name, isOnline, participants, conversationId }) => {
         visibleabltyToggle={MembersDialogVisibleabltyToggle}
         participants={participants}
         conversationId={conversationId}
+        messages={messages}
       />
     </>
   );
