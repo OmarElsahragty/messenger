@@ -3,9 +3,7 @@ import { Box } from "@material-ui/core";
 import { SenderBubble, OtherUserBubble } from "../ActiveChat";
 import moment from "moment";
 
-const Messages = (props) => {
-  const { messages, otherUser, userId } = props;
-
+const Messages = ({ messages, users = [], userId }) => {
   return (
     <Box>
       {messages.map((message) => {
@@ -17,8 +15,8 @@ const Messages = (props) => {
           <OtherUserBubble
             key={message.id}
             text={message.text}
+            otherUser={users.find((user) => user.id === message.senderId)}
             time={time}
-            otherUser={otherUser}
           />
         );
       })}

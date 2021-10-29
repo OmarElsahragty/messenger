@@ -5,6 +5,8 @@ import {
   removeOfflineUserFromStore,
   addMessageToStore,
   updateUnseenMessagesInStore,
+  addConvoUser,
+  removeConvoUser,
 } from "./utils/reducerFunctions";
 
 // ACTIONS
@@ -17,6 +19,8 @@ const SET_SEARCHED_USERS = "SET_SEARCHED_USERS";
 const CLEAR_SEARCHED_USERS = "CLEAR_SEARCHED_USERS";
 const ADD_CONVERSATION = "ADD_CONVERSATION";
 const MARK_CONVERSATION_AS_SEEN = "MARK_CONVERSATION_AS_SEEN";
+const ADD_USER_CONV = "ADD_USER_CONV";
+const REMOVE_USER_CONV = "REMOVE_USER_CONV";
 
 // ACTION CREATORS
 
@@ -27,10 +31,10 @@ export const gotConversations = (conversations) => {
   };
 };
 
-export const setNewMessage = (message, sender, activeConversation) => {
+export const setNewMessage = (message, userId, activeConversation) => {
   return {
     type: SET_MESSAGE,
-    payload: { message, sender: sender ?? null, activeConversation },
+    payload: { message, userId, activeConversation },
   };
 };
 
@@ -62,17 +66,31 @@ export const clearSearchedUsers = () => {
 };
 
 // add new conversation when sending a new message
-export const addConversation = (recipientId, newMessage) => {
+export const addConversation = (conversation) => {
   return {
     type: ADD_CONVERSATION,
-    payload: { recipientId, newMessage },
+    payload: { conversation },
   };
 };
 
-export const conversationSeen = (recipientId) => {
+export const conversationSeen = (conversationId) => {
   return {
     type: MARK_CONVERSATION_AS_SEEN,
-    payload: recipientId,
+    payload: conversationId,
+  };
+};
+
+export const addUserToConvAction = (data) => {
+  return {
+    type: ADD_USER_CONV,
+    data,
+  };
+};
+
+export const removeUserFromConvAction = (data) => {
+  return {
+    type: REMOVE_USER_CONV,
+    data,
   };
 };
 
@@ -93,15 +111,17 @@ const reducer = (state = [], action) => {
     case SET_SEARCHED_USERS:
       return addSearchedUsersToStore(state, action.users);
     case CLEAR_SEARCHED_USERS:
-      return state.filter((convo) => convo.id);
+      return state.filter((convo) => convo.id && typeof convo.id === "number");
     case ADD_CONVERSATION:
-      return addNewConvoToStore(
-        state,
-        action.payload.recipientId,
-        action.payload.newMessage
-      );
+      return addNewConvoToStore(state, action.payload.conversation);
     case MARK_CONVERSATION_AS_SEEN:
       return updateUnseenMessagesInStore(state, action.payload);
+    case ADD_USER_CONV: {
+      return addConvoUser(state, action.data);
+    }
+    case REMOVE_USER_CONV: {
+      return removeConvoUser(state, action.data);
+    }
     default:
       return state;
   }

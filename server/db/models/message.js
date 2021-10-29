@@ -2,18 +2,27 @@ const Sequelize = require("sequelize");
 const db = require("../db");
 
 const Message = db.define("message", {
-  text: {
-    type: Sequelize.STRING,
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
     allowNull: false,
+    primaryKey: true,
+  },
+  conversationId: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+    references: {
+      model: "conversations",
+      key: "id",
+    },
   },
   senderId: {
     type: Sequelize.INTEGER,
     allowNull: false,
   },
-  isSeen: {
-    type: Sequelize.BOOLEAN,
-    defaultValue: false,
-    allowNull: true,
+  text: {
+    type: Sequelize.STRING,
+    allowNull: false,
   },
 });
 

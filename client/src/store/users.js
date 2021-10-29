@@ -1,15 +1,15 @@
-const SET_ACTIVE_CHAT = "SET_ACTIVE_CHAT";
+const SET_USERS = "SET_USERS";
 
-export const setActiveChat = (data) => {
+export const setUsers = (data) => {
   return {
-    type: SET_ACTIVE_CHAT,
+    type: SET_USERS,
     data,
   };
 };
 
 const reducer = (state = {}, action) => {
   switch (action.type) {
-    case SET_ACTIVE_CHAT: {
+    case SET_USERS: {
       return action.data;
     }
     default:

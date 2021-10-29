@@ -30,20 +30,18 @@ const server = http.createServer(app);
 const io = require("socket.io")(server);
 
 io.on("connection", (socket) => {
-  socket.on("go-online", (id) => {
-    socket.join(id);
-    if (!onlineUsers.includes(id)) {
-      onlineUsers.push(id);
+  socket.on("go-online", ({ userId, conversationId }) => {
+    if (conversationId) socket.join(conversationId);
+    if (userId && !onlineUsers.includes(userId)) {
+      onlineUsers.push(userId);
+
+      // send the user who just went online to everyone else who is already online
+      socket.broadcast.emit("add-online-user", userId);
     }
-    // send the user who just went online to everyone else who is already online
-    socket.broadcast.emit("add-online-user", id);
   });
 
   socket.on("new-message", (data) => {
-    socket.to(data.recipientId).emit("new-message", {
-      message: data.message,
-      sender: data.sender,
-    });
+    socket.to(data.conversationId).emit("new-message", data);
   });
 
   socket.on("logout", (id) => {

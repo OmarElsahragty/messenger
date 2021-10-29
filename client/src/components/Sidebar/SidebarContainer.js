@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { Sidebar } from "./index";
-import { searchUsers } from "../../store/utils/thunkCreators";
+import { searchUsers, getUsers } from "../../store/utils/thunkCreators";
 import { clearSearchedUsers } from "../../store/conversations";
 
-const SidebarContainer = (props) => {
-  const { searchUsers, clearSearchedUsers } = props;
-
+const SidebarContainer = ({ searchUsers, clearSearchedUsers, getUsers }) => {
   const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    getUsers();
+  });
 
   const handleChange = async (event) => {
     if (event.target.value === "") {
@@ -35,7 +37,10 @@ const mapDispatchToProps = (dispatch) => {
     },
     clearSearchedUsers: () => {
       dispatch(clearSearchedUsers());
-    }
+    },
+    getUsers: () => {
+      dispatch(getUsers());
+    },
   };
 };
 

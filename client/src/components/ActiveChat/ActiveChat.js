@@ -23,32 +23,34 @@ const useStyles = makeStyles(() => ({
 const ActiveChat = ({ user, conversations, activeConversation }) => {
   const classes = useStyles();
 
+  const conversation = conversations.find(
+    ({ id }) => activeConversation?.conversationId === id
+  );
+
   return (
     <Box className={classes.root}>
-      {conversations.map((conversation) => {
-        return (
-          conversation?.otherUser?.username === activeConversation && (
-            <>
-              <Header
-                username={conversation.otherUser.username}
-                online={conversation.otherUser.online || false}
-              />
-              <Box className={classes.chatContainer}>
-                <Messages
-                  messages={conversation.messages}
-                  otherUser={conversation.otherUser}
-                  userId={user.id}
-                />
-                <Input
-                  otherUser={conversation.otherUser}
-                  conversationId={conversation.id}
-                  user={user}
-                />
-              </Box>
-            </>
-          )
-        );
-      })}
+      {activeConversation?.conversationId && conversation && (
+        <>
+          <Header
+            participants={[user, ...conversation.users]}
+            name={conversation.name}
+            isOnline={conversation.onlineCount > 0}
+            conversationId={conversation.id}
+            messages={conversation.messages}
+          />
+          <Box className={classes.chatContainer}>
+            <Messages
+              userId={user.id}
+              users={conversation.users}
+              messages={conversation.messages}
+            />
+            <Input
+              users={conversation.users}
+              conversationId={conversation.id}
+            />
+          </Box>
+        </>
+      )}
     </Box>
   );
 };

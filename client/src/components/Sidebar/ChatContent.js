@@ -12,9 +12,13 @@ const useStyles = makeStyles(() => ({
   box: {
     width: "100%",
   },
-  username: {
+  name: {
+    width: "60%",
     fontWeight: "bold",
     letterSpacing: -0.2,
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+    textOverflow: "ellipsis",
   },
   previewTextSeen: {
     fontSize: 12,
@@ -23,7 +27,6 @@ const useStyles = makeStyles(() => ({
     width: "150px",
     overflow: "hidden",
     whiteSpace: "nowrap",
-    textOverflow: "ellipsis",
   },
   previewTextUnseen: {
     fontSize: 12,
@@ -37,15 +40,13 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const ChatContent = ({ latestMessageText, otherUser, unseenAlert }) => {
+const ChatContent = ({ name, latestMessageText, unseenAlert }) => {
   const classes = useStyles();
 
   return (
     <Box className={classes.root}>
       <Box className={classes.box}>
-        <Typography className={classes.username}>
-          {otherUser.username}
-        </Typography>
+        <Typography className={classes.name}>{name}</Typography>
         <Typography
           className={
             unseenAlert ? classes.previewTextUnseen : classes.previewTextSeen
